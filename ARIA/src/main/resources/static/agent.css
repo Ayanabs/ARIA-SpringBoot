@@ -397,7 +397,8 @@ body {
 /* Data Table UI */
 .table-responsive {
     width: 100%;
-    overflow-x: auto;
+    max-height: 400px;
+    overflow: auto;
     border-radius: 12px;
     border: 1px solid var(--card-border);
     background: rgba(10, 8, 20, 0.4);
@@ -405,13 +406,19 @@ body {
 
 .results-table {
     width: 100%;
-    border-collapse: collapse;
+    border-collapse: separate;
+    border-spacing: 0;
     text-align: left;
     font-size: 0.9rem;
 }
 
 .results-table th {
-    background: rgba(20, 16, 35, 0.9);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: rgba(20, 16, 35, 0.95);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     color: var(--accent-cyan);
     font-weight: 600;
     padding: 1rem 1.2rem;
@@ -419,6 +426,43 @@ body {
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.5px;
+}
+
+/* JSON Scroll Container & Custom Scrollbars */
+.json-scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-right: 40px;
+}
+
+.table-responsive::-webkit-scrollbar,
+.json-scroll-container::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track,
+.json-scroll-container::-webkit-scrollbar-track {
+    background: rgba(10, 8, 20, 0.2);
+    border-radius: 4px;
+}
+
+.table-responsive::-webkit-scrollbar-thumb,
+.json-scroll-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 4px;
+    transition: background var(--transition-speed);
+}
+
+.table-responsive::-webkit-scrollbar-thumb:hover,
+.json-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.table-responsive,
+.json-scroll-container {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.12) rgba(10, 8, 20, 0.2);
 }
 
 .results-table td {
