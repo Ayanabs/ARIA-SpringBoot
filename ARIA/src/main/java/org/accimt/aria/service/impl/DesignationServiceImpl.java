@@ -53,6 +53,6 @@ public class DesignationServiceImpl implements DesignationService {
 
     @Override
     public void deleteDesignationById(Integer id) {
-        designationRepository.deleteById(id);
+        throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
 }

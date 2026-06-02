@@ -73,7 +73,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUserById(Long id) {
-        userRepository.deleteById(id);
+        throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
 }
 

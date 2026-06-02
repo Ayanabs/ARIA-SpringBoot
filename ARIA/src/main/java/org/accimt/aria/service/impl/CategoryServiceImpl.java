@@ -58,6 +58,6 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void deleteCategoryById(Integer id) {
-        categoryRepository.deleteById(id);
+        throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
 }

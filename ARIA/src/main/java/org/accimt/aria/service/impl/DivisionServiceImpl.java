@@ -56,6 +56,6 @@ public class DivisionServiceImpl implements DivisionService {
 
     @Override
     public void deleteDivisionById(Integer id) {
-        divisionRepository.deleteById(id);
+        throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
 }

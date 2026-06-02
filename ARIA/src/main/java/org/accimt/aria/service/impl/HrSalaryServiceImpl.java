@@ -52,6 +52,6 @@ public class HrSalaryServiceImpl implements HrSalaryService {
 
     @Override
     public void deleteHrSalaryById(String id) {
-        hrSalaryRepository.deleteById(id);
+        throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
 }

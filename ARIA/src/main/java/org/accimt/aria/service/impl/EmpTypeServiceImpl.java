@@ -52,6 +52,6 @@ public class EmpTypeServiceImpl implements EmpTypeService {
 
     @Override
     public void deleteEmpTypeById(Integer id) {
-        empTypeRepository.deleteById(id);
+        throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
 }
