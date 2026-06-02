@@ -1,0 +1,15 @@
+package org.accimt.aria.service;
+
+import org.accimt.aria.dto.EmployeeDto;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public interface EmployeeService {
+    EmployeeDto createEmployee(EmployeeDto dto);
+    EmployeeDto updateEmployee(EmployeeDto dto);
+    EmployeeDto getEmployeeById(Long id);
+    List<EmployeeDto> getAllEmployees();
+    void deleteEmployeeById(Long id);
+}

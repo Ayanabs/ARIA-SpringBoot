@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARIA Intelligent Database Assistant</title>
+    <!-- Google Fonts: Outfit and Fira Code for SQL -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <link rel="stylesheet" href="agent.css">
+</head>
+<body>
+
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>ARIA AI</h1>
+                    <p>Database Console</p>
+                </div>
+            </div>
+
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-panel">
+            
+            <!-- Prompt Input -->
+            <section class="prompt-card">
+                <div class="prompt-header">
+                    <h2>Natural Language Query</h2>
+                    <span class="status-badge idle" id="engine-status">
+                        <i class="fa-solid fa-circle-dot"></i> Ready
+                    </span>
+                </div>
+
+                <div class="prompt-textarea-wrapper">
+                    <textarea 
+                        id="prompt-input" 
+                        class="prompt-textarea" 
+                        placeholder="E.g., Find the top 3 users with the highest salary..."
+                    ></textarea>
+                    <button id="btn-submit" class="btn-send">
+                        <span>Send Prompt</span>
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </div>
+
+                <div class="config-section">
+                    <div class="section-title" style="font-size: 0.8rem;">
+                        <span>Quick Queries</span>
+                    </div>
+                    <div class="templates-wrapper">
+                        <button class="template-btn" data-prompt="Show all employees in emp_details_tbl">
+                            List Employees
+                        </button>
+                        <button class="template-btn" data-prompt="Show all divisions in division_tbl">
+                            List Divisions
+                        </button>
+                        <button class="template-btn" data-prompt="Show all categories in category_tbl">
+                            List Categories
+                        </button>
+                        <button class="template-btn" data-prompt="Count all employees in emp_details_tbl grouped by gender">
+                            Employees by Gender
+                        </button>
+                        <button class="template-btn" data-prompt="Show all employees in emp_details_tbl with categorycode 2">
+                            Technical Staff Employees
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Output -->
+            <section class="output-card">
+                <div class="output-header">
+                    <h3>
+                        <i class="fa-solid fa-code"></i>
+                        <span>Execution Results</span>
+                    </h3>
+                    <div class="stats-badge-container" id="stats-container" style="display: none;">
+                        <div class="stat-badge">
+                            <i class="fa-solid fa-clock"></i>
+                            <span>Time: <strong id="stat-time">0ms</strong></span>
+                        </div>
+                        <div class="stat-badge">
+                            <i class="fa-solid fa-list-numeric"></i>
+                            <span>Rows: <strong id="stat-rows">0</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loader state -->
+                <div id="loader-state" style="display: none;">
+                    <div class="pulse-loader">
+                        <div class="pulse-dot"></div>
+                        <div class="pulse-dot"></div>
+                        <div class="pulse-dot"></div>
+                    </div>
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.95rem;">
+                        Asking Ollama model to generate SQL, running query on database...
+                    </p>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state" id="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h4>No Query Executed Yet</h4>
+                    <p>Enter a natural language request above or select a quick query to generate and execute SQL automatically.</p>
+                </div>
+
+                <!-- Error State -->
+                <div class="error-message" id="error-state" style="display: none;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span id="error-text">An error occurred during query generation.</span>
+                </div>
+
+                <!-- SQL block display -->
+                <div id="sql-block-wrapper" style="display: none;">
+                    <div class="section-title" style="margin-bottom: 0.5rem; font-size: 0.8rem;">
+                        <i class="fa-solid fa-scroll"></i> Generated SQL Query
+                    </div>
+                    <div class="sql-view-container">
+                        <code class="sql-code" id="sql-code-display">SELECT * FROM users;</code>
+                        <button class="btn-copy" id="btn-copy-sql" title="Copy SQL to Clipboard">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- View Tabs -->
+                <div class="view-tabs-container" id="view-tabs-container" style="display: none; margin-top: 1rem; border-bottom: 1px solid rgba(255, 255, 255, 0.05); padding-bottom: 0.5rem; display: flex; gap: 1rem;">
+                    <button class="view-tab" id="tab-table" style="background: none; border: none; color: var(--accent-cyan); font-family: inherit; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-weight: 600; padding: 0.2rem 0.5rem; transition: color var(--transition-speed);">
+                        <i class="fa-solid fa-table-list"></i> Table View
+                    </button>
+                    <button class="view-tab" id="tab-json" style="background: none; border: none; color: var(--text-muted); font-family: inherit; font-size: 0.9rem; cursor: pointer; display: flex; align-items: center; gap: 0.4rem; font-weight: 600; padding: 0.2rem 0.5rem; transition: color var(--transition-speed);">
+                        <i class="fa-solid fa-braces"></i> JSON View
+                    </button>
+                </div>
+
+                <!-- Data Table Output -->
+                <div id="table-wrapper" style="display: none;">
+                    <div class="section-title" style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.8rem;">
+                        <i class="fa-solid fa-table-list"></i> Database Records
+                    </div>
+                    <div class="table-responsive">
+                        <table class="results-table" id="results-table">
+                            <thead>
+                                <tr id="table-headers">
+                                    <!-- Dynamic headers go here -->
+                                </tr>
+                            </thead>
+                            <tbody id="table-body">
+                                <!-- Dynamic rows go here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- JSON block display -->
+                <div id="json-block-wrapper" style="display: none;">
+                    <div class="section-title" style="margin-top: 1rem; margin-bottom: 0.5rem; font-size: 0.8rem;">
+                        <i class="fa-solid fa-braces"></i> Raw JSON Response
+                    </div>
+                    <div class="sql-view-container" style="background: rgba(10, 8, 20, 0.8); border: 1px solid var(--card-border); border-radius: 12px; padding: 1.2rem; position: relative;">
+                        <pre style="margin: 0; overflow-x: auto;"><code class="json-code" id="json-code-display" style="font-family: 'Fira Code', monospace; font-size: 0.95rem; color: #e2e8f0; white-space: pre-wrap; word-break: break-all;">[]</code></pre>
+                        <button class="btn-copy" id="btn-copy-json" title="Copy JSON to Clipboard" style="position: absolute; top: 12px; right: 12px; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition-speed);">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Scripting for UI functionality -->
+    <script>
+        const API_BASE = '/api/agent-query';
+        
+        // UI Elements
+        const promptInput = document.getElementById('prompt-input');
+        const btnSubmit = document.getElementById('btn-submit');
+        const engineStatus = document.getElementById('engine-status');
+        const emptyState = document.getElementById('empty-state');
+        const loaderState = document.getElementById('loader-state');
+        const errorState = document.getElementById('error-state');
+        const errorText = document.getElementById('error-text');
+        const sqlBlockWrapper = document.getElementById('sql-block-wrapper');
+        const sqlCodeDisplay = document.getElementById('sql-code-display');
+        const tableWrapper = document.getElementById('table-wrapper');
+        const tableHeaders = document.getElementById('table-headers');
+        const tableBody = document.getElementById('table-body');
+        const statsContainer = document.getElementById('stats-container');
+        const statTime = document.getElementById('stat-time');
+        const statRows = document.getElementById('stat-rows');
+        const btnCopySql = document.getElementById('btn-copy-sql');
+        
+        const tabTable = document.getElementById('tab-table');
+        const tabJson = document.getElementById('tab-json');
+        const jsonBlockWrapper = document.getElementById('json-block-wrapper');
+        const jsonCodeDisplay = document.getElementById('json-code-display');
+        const btnCopyJson = document.getElementById('btn-copy-json');
+        const viewTabsContainer = document.getElementById('view-tabs-container');
+
+
+        // Copy SQL to clipboard helper
+        btnCopySql.addEventListener('click', () => {
+            const codeText = sqlCodeDisplay.textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const icon = btnCopySql.querySelector('i');
+                icon.className = 'fa-solid fa-check';
+                icon.style.color = 'var(--success)';
+                setTimeout(() => {
+                    icon.className = 'fa-regular fa-copy';
+                    icon.style.color = '';
+                }, 2000);
+            });
+        });
+
+
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                promptInput.value = btn.dataset.prompt;
+                promptInput.focus();
+            });
+        });
+
+
+        async function runAgentQuery() {
+            const prompt = promptInput.value.trim();
+            if (!prompt) return;
+
+
+            btnSubmit.disabled = true;
+            promptInput.disabled = true;
+            loaderState.style.display = 'block';
+            emptyState.style.display = 'none';
+            errorState.style.display = 'none';
+            sqlBlockWrapper.style.display = 'none';
+            tableWrapper.style.display = 'none';
+            jsonBlockWrapper.style.display = 'none';
+            viewTabsContainer.style.display = 'none';
+            statsContainer.style.display = 'none';
+            
+            engineStatus.className = 'status-badge error';
+            engineStatus.innerHTML = '<i class="fa-solid fa-spinner spinner"></i> Thinking';
+            engineStatus.style.background = 'rgba(236, 72, 153, 0.15)';
+            engineStatus.style.color = 'var(--accent-pink)';
+            engineStatus.style.border = '1px solid rgba(236, 72, 153, 0.2)';
+
+            try {
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ prompt })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.error) {
+                    // Show error state with generated SQL if available
+                    showError(data.error);
+                    if (data.sql) {
+                        showSQL(data.sql);
+                    }
+                } else {
+                    // Show SQL query
+                    showSQL(data.sql);
+                    
+                    // Check if prompt wants json
+                    if (prompt.toLowerCase().includes('json')) {
+                        tabJson.style.color = 'var(--accent-cyan)';
+                        tabTable.style.color = 'var(--text-muted)';
+                    } else {
+                        tabTable.style.color = 'var(--accent-cyan)';
+                        tabJson.style.color = 'var(--text-muted)';
+                    }
+
+                    // Show results table
+                    showResults(data.results);
+
+                    // Show Stats
+                    statsContainer.style.display = 'flex';
+                    statTime.textContent = `${data.executionTimeMs}ms`;
+                    statRows.textContent = data.results ? data.results.length : 0;
+                    
+                    engineStatus.className = 'status-badge success';
+                    engineStatus.innerHTML = '<i class="fa-solid fa-circle-check"></i> Executed';
+                    engineStatus.style.background = '';
+                    engineStatus.style.color = '';
+                    engineStatus.style.border = '';
+                }
+            } catch (err) {
+                showError(err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                promptInput.disabled = false;
+                loaderState.style.display = 'none';
+                if (engineStatus.innerHTML.includes('Thinking')) {
+                    engineStatus.className = 'status-badge idle';
+                    engineStatus.innerHTML = '<i class="fa-solid fa-circle-dot"></i> Ready';
+                    engineStatus.style.background = '';
+                    engineStatus.style.color = '';
+                    engineStatus.style.border = '';
+                }
+            }
+        }
+
+        function showError(message) {
+            errorState.style.display = 'flex';
+            errorText.textContent = message;
+            engineStatus.className = 'status-badge error';
+            engineStatus.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Failed';
+            engineStatus.style.background = '';
+            engineStatus.style.color = '';
+            engineStatus.style.border = '';
+        }
+
+        function highlightSQL(sql) {
+            const keywords = ['SELECT', 'FROM', 'WHERE', 'ORDER BY', 'GROUP BY', 'LIMIT', 'JOIN', 'ON', 'AS', 'AND', 'OR', 'IN', 'HAVING', 'DESC', 'ASC', 'COUNT', 'SUM', 'AVG', 'MIN', 'MAX'];
+            let highlighted = sql;
+            
+            // Highlight keywords
+            keywords.forEach(kw => {
+                const regex = new RegExp(`\\b${kw}\\b`, 'gi');
+                highlighted = highlighted.replace(regex, `<span class="sql-highlight-keyword">${kw}</span>`);
+            });
+
+            // Highlight tables (users, employee)
+            const tables = ['users', 'employee'];
+            tables.forEach(table => {
+                const regex = new RegExp(`\\b${table}\\b`, 'gi');
+                highlighted = highlighted.replace(regex, `<span class="sql-highlight-table">${table}</span>`);
+            });
+
+            return highlighted;
+        }
+
+        // Fix to show raw text copy cleanly
+        function showSQL(sql) {
+            sqlBlockWrapper.style.display = 'block';
+            sqlCodeDisplay.innerHTML = highlightSQL(sql);
+        }
+
+        function showResults(results) {
+            if (!results || results.length === 0) {
+                tableWrapper.style.display = 'none';
+                jsonBlockWrapper.style.display = 'none';
+                viewTabsContainer.style.display = 'none';
+                emptyState.style.display = 'flex';
+                emptyState.querySelector('h4').textContent = 'No Records Found';
+                emptyState.querySelector('p').textContent = 'The query executed successfully but returned 0 results from the database.';
+                return;
+            }
+
+            // Set JSON content
+            jsonCodeDisplay.textContent = JSON.stringify(results, null, 2);
+            viewTabsContainer.style.display = 'flex';
+
+            // Headers
+            const headers = Object.keys(results[0]);
+            tableHeaders.innerHTML = '';
+            headers.forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                tableHeaders.appendChild(th);
+            });
+
+            // Rows
+            tableBody.innerHTML = '';
+            results.forEach(row => {
+                const tr = document.createElement('tr');
+                headers.forEach(header => {
+                    const td = document.createElement('td');
+                    // Handle values
+                    const val = row[header];
+                    if (val === null || val === undefined) {
+                        td.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">null</span>';
+                    } else if (typeof val === 'object') {
+                        td.textContent = JSON.stringify(val);
+                    } else {
+                        td.textContent = val;
+                    }
+                    tr.appendChild(td);
+                });
+                tableBody.appendChild(tr);
+            });
+
+            if (tabJson.style.color === 'var(--accent-cyan)') {
+                jsonBlockWrapper.style.display = 'block';
+                tableWrapper.style.display = 'none';
+            } else {
+                tableWrapper.style.display = 'block';
+                jsonBlockWrapper.style.display = 'none';
+            }
+        }
+
+        btnSubmit.addEventListener('click', runAgentQuery);
+        promptInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                runAgentQuery();
+            }
+        });
+
+        // Tab Event Listeners
+        tabTable.addEventListener('click', () => {
+            tabTable.style.color = 'var(--accent-cyan)';
+            tabJson.style.color = 'var(--text-muted)';
+            if (jsonCodeDisplay.textContent !== '[]') {
+                tableWrapper.style.display = 'block';
+            }
+            jsonBlockWrapper.style.display = 'none';
+        });
+
+        tabJson.addEventListener('click', () => {
+            tabJson.style.color = 'var(--accent-cyan)';
+            tabTable.style.color = 'var(--text-muted)';
+            tableWrapper.style.display = 'none';
+            if (jsonCodeDisplay.textContent !== '[]') {
+                jsonBlockWrapper.style.display = 'block';
+            }
+        });
+
+        // Copy JSON helper
+        btnCopyJson.addEventListener('click', () => {
+            const codeText = jsonCodeDisplay.textContent;
+            navigator.clipboard.writeText(codeText).then(() => {
+                const icon = btnCopyJson.querySelector('i');
+                icon.className = 'fa-solid fa-check';
+                icon.style.color = 'var(--success)';
+                setTimeout(() => {
+                    icon.className = 'fa-regular fa-copy';
+                    icon.style.color = '';
+                }, 2000);
+            });
+        });
+    </script>
+</body>
+</html>
