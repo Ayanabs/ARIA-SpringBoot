@@ -17,12 +17,16 @@ public class DesignationTools {
     @Tool("Fetches details of all designations from the database (maps to /api/designations)")
     public Object fetchAllDesignations() {
         RoutingContext.addEndpoint("/api/designations");
-        return designationService.getAllDesignations();
+        Object result = designationService.getAllDesignations();
+        RoutingContext.setLastResult(result);
+        return result;
     }
 
     @Tool("Fetches details of a specific designation by its unique ID (maps to /api/designations/{id})")
     public Object fetchDesignationById(@P("The unique numeric ID of the designation") Integer id) {
         RoutingContext.addEndpoint("/api/designations/" + id);
-        return designationService.getDesignationById(id);
+        Object result = designationService.getDesignationById(id);
+        RoutingContext.setLastResult(result);
+        return result;
     }
 }

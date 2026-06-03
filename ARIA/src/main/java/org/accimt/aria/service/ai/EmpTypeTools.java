@@ -17,12 +17,16 @@ public class EmpTypeTools {
     @Tool("Fetches details of all employee types from the database (maps to /api/employee-types)")
     public Object fetchAllEmployeeTypes() {
         RoutingContext.addEndpoint("/api/employee-types");
-        return empTypeService.getAllEmpTypes();
+        Object result = empTypeService.getAllEmpTypes();
+        RoutingContext.setLastResult(result);
+        return result;
     }
 
     @Tool("Fetches details of a specific employee type by its unique ID (maps to /api/employee-types/{id})")
     public Object fetchEmployeeTypeById(@P("The unique numeric ID of the employee type") Integer id) {
         RoutingContext.addEndpoint("/api/employee-types/" + id);
-        return empTypeService.getEmpTypeById(id);
+        Object result = empTypeService.getEmpTypeById(id);
+        RoutingContext.setLastResult(result);
+        return result;
     }
 }

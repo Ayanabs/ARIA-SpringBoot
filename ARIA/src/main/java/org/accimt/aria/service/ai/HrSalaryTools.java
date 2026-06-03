@@ -17,12 +17,16 @@ public class HrSalaryTools {
     @Tool("Fetches details of all salary scales from the database (maps to /api/salary-scales)")
     public Object fetchAllSalaryScales() {
         RoutingContext.addEndpoint("/api/salary-scales");
-        return hrSalaryService.getAllHrSalaries();
+        Object result = hrSalaryService.getAllHrSalaries();
+        RoutingContext.setLastResult(result);
+        return result;
     }
 
     @Tool("Fetches details of a specific salary scale by its unique salary code (maps to /api/salary-scales/{id})")
     public Object fetchSalaryScaleByCode(@P("The unique alphanumeric code of the salary scale") String code) {
         RoutingContext.addEndpoint("/api/salary-scales/" + code);
-        return hrSalaryService.getHrSalaryById(code);
+        Object result = hrSalaryService.getHrSalaryById(code);
+        RoutingContext.setLastResult(result);
+        return result;
     }
 }

@@ -82,4 +82,32 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void deleteEmployeeById(Long id) {
         throw new UnsupportedOperationException("Deletions are not allowed in this project");
     }
+
+    @Override
+    public EmployeeDto getEmployeeByEmail(String email) {
+        Employee employee = employeeRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with email: " + email));
+        return employeeMapping.toDto(employee);
+    }
+
+    @Override
+    public EmployeeDto getEmployeeByEmpno(Integer empno) {
+        Employee employee = employeeRepository.findByEmpno(empno)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with employee number: " + empno));
+        return employeeMapping.toDto(employee);
+    }
+
+    @Override
+    public EmployeeDto getEmployeeByNicnum(String nicnum) {
+        Employee employee = employeeRepository.findByNicnum(nicnum)
+                .orElseThrow(() -> new ResourceNotFoundException("Employee not found with NIC number: " + nicnum));
+        return employeeMapping.toDto(employee);
+    }
+
+    @Override
+    public List<EmployeeDto> getEmployeesByPhone(String phone) {
+        return employeeRepository.findByMobilenoOrPhoneOfficeOrPhoneResidence(phone, phone, phone).stream()
+                .map(employeeMapping::toDto)
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

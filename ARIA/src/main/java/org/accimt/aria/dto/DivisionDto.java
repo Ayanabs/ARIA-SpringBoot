@@ -16,4 +16,8 @@ public class DivisionDto {
     private Integer hod;
     private Integer ddg;
     private Integer dg;
+
+    private EmployeeDto headOfDivision;
+    private EmployeeDto deputyDirectorGeneral;
+    private EmployeeDto directorGeneral;
 }

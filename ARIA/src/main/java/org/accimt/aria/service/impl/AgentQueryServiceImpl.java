@@ -64,20 +64,42 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             String processedJson = agentQueryAgent.runAgent(prompt);
             log.info("Agent processed response: {}", processedJson);
 
-            // Retrieve the endpoint that was called by the LLM tool
+            // Retrieve all endpoints that were called by the LLM tool
             List<String> endpoints = org.accimt.aria.service.ai.RoutingContext.getCalledEndpoints();
-            String endpoint = endpoints.isEmpty() ? null : endpoints.get(endpoints.size() - 1);
-            log.info("Tool called endpoint: {}", endpoint);
+            String endpointStr = endpoints.isEmpty() ? "None" : String.join(", ", endpoints);
+            log.info("Tool called endpoints: {}", endpointStr);
 
-            String cleanedJson = cleanJson(processedJson);
-            List<Map<String, Object>> queryResults = objectMapper.readValue(
-                    cleanedJson, 
-                    new TypeReference<List<Map<String, Object>>>() {}
-            );
+            List<Map<String, Object>> queryResults;
+            Object rawResult = org.accimt.aria.service.ai.RoutingContext.getLastResult();
+            if (rawResult != null) {
+                log.info("Directly using raw result from tool call of class: {}", rawResult.getClass().getName());
+                if (rawResult instanceof Collection) {
+                    queryResults = objectMapper.convertValue(rawResult, new TypeReference<List<Map<String, Object>>>() {});
+                } else {
+                    Map<String, Object> map = objectMapper.convertValue(rawResult, new TypeReference<Map<String, Object>>() {});
+                    queryResults = Collections.singletonList(map);
+                }
+            } else {
+                String cleanedJson = cleanJson(processedJson);
+                try {
+                    queryResults = objectMapper.readValue(
+                            cleanedJson, 
+                            new TypeReference<List<Map<String, Object>>>() {}
+                    );
+                } catch (Exception parseException) {
+                    log.warn("Failed to parse agent JSON response: {}. Error: {}", cleanedJson, parseException.getMessage());
+                    // Fallback: check if it's an empty/placeholder response
+                    if (cleanedJson.equals("[]") || cleanedJson.matches("\\[\\s*\\.*\\s*\\]")) {
+                        queryResults = new ArrayList<>();
+                    } else {
+                        throw new RuntimeException("The agent returned an invalid JSON response. Please refine your query.");
+                    }
+                }
+            }
             long executionTime = System.currentTimeMillis() - startTime;
 
             return AgentQueryResponse.builder()
-                    .sql("Agent routed request to API endpoint via Tool Call: " + (endpoint != null ? endpoint : "None"))
+                    .sql("Agent routed request to API endpoint via Tool Call: " + endpointStr)
                     .results(queryResults)
                     .executionTimeMs(executionTime)
                     .build();

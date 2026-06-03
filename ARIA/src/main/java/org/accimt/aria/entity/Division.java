@@ -3,6 +3,8 @@ package org.accimt.aria.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 @Entity
 @Setter
@@ -29,4 +31,19 @@ public class Division {
 
     @Column(name = "dg")
     private Integer dg;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hod", referencedColumnName = "empno", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Employee headOfDivision;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ddg", referencedColumnName = "empno", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Employee deputyDirectorGeneral;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dg", referencedColumnName = "empno", insertable = false, updatable = false)
+    @NotFound(action = NotFoundAction.IGNORE)
+    private Employee directorGeneral;
 }

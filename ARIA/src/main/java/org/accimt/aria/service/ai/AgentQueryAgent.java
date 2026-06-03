@@ -10,6 +10,7 @@ public interface AgentQueryAgent {
 
     @SystemMessage({
         "You are an API router. Based on the user's prompt, select the correct read-only API endpoint to fetch the required data.",
+        "You only have read-only access to the database. You CANNOT perform any create, update, or delete operations.",
         "The available endpoints are:",
        
         "",
@@ -28,8 +29,8 @@ public interface AgentQueryAgent {
         "- If the user prompt requests sorting or limiting (e.g., top 5 by appointment date), sort the records and limit the count.",
         "",
         "Rules:",
-        "1. You MUST return the final processed data as a raw JSON array of objects (e.g., [{\"field\": \"value\"}]).",
-        "2. Output ONLY the raw JSON array. Do NOT wrap the JSON in markdown code blocks like ```json ... ```. Do NOT include any explanations or conversational text. Your response must start with '[' and end with ']'.",
+        "1. You MUST return the final processed data as a raw JSON array of objects (e.g., [{\"field\": \"value\"}]). Never abbreviate or truncate the data inside the JSON using '...' or placeholders.",
+        "2. Output ONLY the raw JSON array. Do NOT wrap the JSON in markdown code blocks like ```json ... ```. Do NOT include any explanations or conversational text. Your response must start with '[' and end with ']'. Never output `[...]` as a placeholder.",
         "3. If no data is found, return an empty JSON array: []"
     })
     @UserMessage("User Prompt: {{prompt}}\nRaw JSON Data: {{rawData}}")
@@ -40,10 +41,12 @@ public interface AgentQueryAgent {
         "Your task is to answer the user's prompt by fetching the appropriate data using the provided tools, and then processing/formatting the response.",
         "Rules:",
         "1. To satisfy the user's request, identify which specialized tool (e.g. `fetchAllEmployees`, `fetchEmployeeById`, `fetchAllDivisions`, `fetchDivisionById`, etc.) is needed to get the required data and call that tool with any necessary parameters.",
-        "2. Once you receive the data from the tool, process it in-memory to satisfy the user's prompt. By default, unless the user prompt explicitly requests only specific fields, a count, or aggregates, you MUST preserve and output all fields from the retrieved database records.",
-        "3. You MUST return the final processed data as a raw JSON array of objects (e.g., [{\"field\": \"value\"}]).",
-        "4. Output ONLY the raw JSON array. Do NOT wrap the JSON in markdown code blocks like ```json ... ```. Do NOT include any explanations or conversational text. Your response must start with '[' and end with ']'.",
-        "5. If no data is found, return an empty JSON array: []"
+        "2. You only have read-only access to the database. You CANNOT perform any create, update, or delete operations.",
+        "3. If you need data from multiple tools, you MUST call them sequentially (one after another), waiting for the result of the first tool before calling the next one. Do NOT request multiple tool calls in parallel.",
+        "4. Once you receive the data from the tool, process it in-memory to satisfy the user's prompt. By default, unless the user prompt explicitly requests only specific fields, a count, or aggregates, you MUST preserve and output all fields from the retrieved database records.",
+        "5. You MUST return the final processed data as a raw JSON array of objects (e.g., [{\"field\": \"value\"}]). Never abbreviate or truncate the data inside the JSON using '...' or placeholders.",
+        "6. Output ONLY the raw JSON array. Do NOT wrap the JSON in markdown code blocks like ```json ... ```. Do NOT include any explanations or conversational text. Your response must start with '[' and end with ']'. Never output `[...]` as a placeholder.",
+        "7. If no data is found, return an empty JSON array: []"
     })
     String runAgent(String prompt);
 }

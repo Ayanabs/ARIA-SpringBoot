@@ -21,7 +21,9 @@ public class LlmConfig {
                 .baseUrl(baseUrl)
                 .modelName(modelName)
                 .think(false)
-                .temperature(0.3)
+                .temperature(0.0)
+                .topP(0.9)
+                .topK(40)
                 .timeout(java.time.Duration.ofSeconds(180))
                 .returnThinking(false)
                 .build();

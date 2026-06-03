@@ -22,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/employees")
 @AllArgsConstructor
+@CrossOrigin(origins = "*")
 public class EmployeeController {
 
     private final EmployeeService employeeService;
@@ -82,5 +83,30 @@ public class EmployeeController {
     @GetMapping("/{id}")
     public ResponseEntity<EmployeeDto> getEmployeeById(@PathVariable Long id) {
         return ResponseEntity.ok(employeeService.getEmployeeById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<EmployeeDto> createEmployee(@Valid @RequestBody EmployeeDto employeeDto) {
+        return new ResponseEntity<>(employeeService.createEmployee(employeeDto), HttpStatus.CREATED);
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<EmployeeDto> getEmployeeByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(employeeService.getEmployeeByEmail(email));
+    }
+
+    @GetMapping("/empno/{empno}")
+    public ResponseEntity<EmployeeDto> getEmployeeByEmpno(@PathVariable Integer empno) {
+        return ResponseEntity.ok(employeeService.getEmployeeByEmpno(empno));
+    }
+
+    @GetMapping("/nic/{nicnum}")
+    public ResponseEntity<EmployeeDto> getEmployeeByNicnum(@PathVariable String nicnum) {
+        return ResponseEntity.ok(employeeService.getEmployeeByNicnum(nicnum));
+    }
+
+    @GetMapping("/phone/{phone}")
+    public ResponseEntity<List<EmployeeDto>> getEmployeesByPhone(@PathVariable String phone) {
+        return ResponseEntity.ok(employeeService.getEmployeesByPhone(phone));
     }
 }

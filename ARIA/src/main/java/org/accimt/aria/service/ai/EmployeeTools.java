@@ -2,8 +2,10 @@ package org.accimt.aria.service.ai;
 
 import dev.langchain4j.agent.tool.Tool;
 import dev.langchain4j.agent.tool.P;
+import org.accimt.aria.dto.EmployeeDto;
 import org.accimt.aria.service.EmployeeService;
 import org.springframework.stereotype.Component;
+import java.time.LocalDate;
 
 @Component
 public class EmployeeTools {
@@ -17,13 +19,48 @@ public class EmployeeTools {
     @Tool("Fetches details of all employees from the database (maps to /api/employees)")
     public Object fetchAllEmployees() {
         RoutingContext.addEndpoint("/api/employees");
-        return employeeService.getAllEmployees();
+        Object result = employeeService.getAllEmployees();
+        RoutingContext.setLastResult(result);
+        return result;
     }
 
     @Tool("Fetches details of a specific employee by their unique ID (maps to /api/employees/{id})")
     public Object fetchEmployeeById(@P("The unique numeric ID of the employee") Long id) {
         RoutingContext.addEndpoint("/api/employees/" + id);
-        return employeeService.getEmployeeById(id);
+        Object result = employeeService.getEmployeeById(id);
+        RoutingContext.setLastResult(result);
+        return result;
     }
-   
+
+    @Tool("Fetches employee details by their email address (maps to /api/employees/email/{email})")
+    public Object fetchEmployeeByEmail(@P("The email address of the employee") String email) {
+        RoutingContext.addEndpoint("/api/employees/email/" + email);
+        Object result = employeeService.getEmployeeByEmail(email);
+        RoutingContext.setLastResult(result);
+        return result;
+    }
+
+    @Tool("Fetches employee details by their employee number (maps to /api/employees/empno/{empno})")
+    public Object fetchEmployeeByEmpno(@P("The numeric employee number") Integer empno) {
+        RoutingContext.addEndpoint("/api/employees/empno/" + empno);
+        Object result = employeeService.getEmployeeByEmpno(empno);
+        RoutingContext.setLastResult(result);
+        return result;
+    }
+
+    @Tool("Fetches employee details by their National Identity Card (NIC) number (maps to /api/employees/nic/{nicnum})")
+    public Object fetchEmployeeByNicnum(@P("The NIC card number") String nicnum) {
+        RoutingContext.addEndpoint("/api/employees/nic/" + nicnum);
+        Object result = employeeService.getEmployeeByNicnum(nicnum);
+        RoutingContext.setLastResult(result);
+        return result;
+    }
+
+    @Tool("Fetches a list of employees matching a phone or mobile number (maps to /api/employees/phone/{phone})")
+    public Object fetchEmployeesByPhone(@P("The phone or mobile number") String phone) {
+        RoutingContext.addEndpoint("/api/employees/phone/" + phone);
+        Object result = employeeService.getEmployeesByPhone(phone);
+        RoutingContext.setLastResult(result);
+        return result;
+    }
 }

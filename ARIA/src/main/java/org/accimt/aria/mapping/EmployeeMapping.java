@@ -34,7 +34,37 @@ public class EmployeeMapping {
         if (entity == null) {
             return null;
         }
-        EmployeeDto dto = objectMapper.convertValue(entity, EmployeeDto.class);
+        EmployeeDto dto = new EmployeeDto();
+        dto.setId(entity.getId());
+        dto.setEmpno(entity.getEmpno());
+        dto.setTitle(entity.getTitle());
+        dto.setFullname(entity.getFullname());
+        dto.setNicnum(entity.getNicnum());
+        dto.setDob(entity.getDob());
+        dto.setGender(entity.getGender());
+        dto.setEmail(entity.getEmail());
+        dto.setMobileno(entity.getMobileno());
+        dto.setDateofappoinment(entity.getDateofappoinment());
+        dto.setDivisioncode(entity.getDivisioncode());
+        dto.setDesigcode(entity.getDesigcode());
+        dto.setEmptypecode(entity.getEmptypecode());
+        dto.setCategorycode(entity.getCategorycode());
+        dto.setRetirementdt(entity.getRetirementdt());
+        dto.setProbationperiod(entity.getProbationperiod());
+        dto.setProbationperiodto(entity.getProbationperiodto());
+        dto.setResignation(entity.getResignation());
+        dto.setAddress(entity.getAddress());
+        dto.setAddress2(entity.getAddress2());
+        dto.setAddress3(entity.getAddress3());
+        dto.setSalarycode(entity.getSalarycode());
+        dto.setMaritalstatus(entity.getMaritalstatus());
+        dto.setGrade(entity.getGrade());
+        dto.setTBillEntitle(entity.getTBillEntitle());
+        dto.setPhoneOffice(entity.getPhoneOffice());
+        dto.setPhoneResidence(entity.getPhoneResidence());
+        dto.setEmpNamewithInit(entity.getEmpNamewithInit());
+        dto.setIncrementDate(entity.getIncrementDate());
+        dto.setStatus(entity.getStatus());
         if (entity.getCategory() != null) {
             dto.setCategory(categoryMapping.toDto(entity.getCategory()));
         }
