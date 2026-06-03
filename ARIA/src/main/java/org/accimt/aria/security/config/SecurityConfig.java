@@ -45,7 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/employees/login").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/error").permitAll()
-                        .requestMatchers("/agent.html", "/agent.css").permitAll()
+                        .requestMatchers("/agent.html", "/agent.css","/acc-logo.png").permitAll()
                         .requestMatchers("/api/agent-query/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .anyRequest().hasRole("EMPLOYEE")
