@@ -18,15 +18,21 @@ public class CategoryTools {
     public Object fetchAllCategories() {
         RoutingContext.addEndpoint("/api/categories");
         Object result = categoryService.getAllCategories();
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
     @Tool("Fetches details of a specific category by its unique ID (maps to /api/categories/{id})")
-    public Object fetchCategoryById(@P("The unique numeric ID of the category") Integer id) {
-        RoutingContext.addEndpoint("/api/categories/" + id);
+    public Object fetchCategoryById(@P("The unique numeric ID of the category") Object idVal) {
+        String idStr = String.valueOf(idVal);
+        RoutingContext.addEndpoint("/api/categories/" + idStr);
+        String cleaned = idStr.replaceAll("[^0-9]", "");
+        if (cleaned.isEmpty()) {
+            throw new IllegalArgumentException("Invalid category ID format: " + idStr);
+        }
+        Integer id = Integer.parseInt(cleaned);
         Object result = categoryService.getCategoryById(id);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 }

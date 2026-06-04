@@ -20,15 +20,21 @@ public class EmployeeTools {
     public Object fetchAllEmployees() {
         RoutingContext.addEndpoint("/api/employees");
         Object result = employeeService.getAllEmployees();
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
     @Tool("Fetches details of a specific employee by their unique ID (maps to /api/employees/{id})")
-    public Object fetchEmployeeById(@P("The unique numeric ID of the employee") Long id) {
-        RoutingContext.addEndpoint("/api/employees/" + id);
+    public Object fetchEmployeeById(@P("The unique numeric ID of the employee") Object idVal) {
+        String idStr = String.valueOf(idVal);
+        RoutingContext.addEndpoint("/api/employees/" + idStr);
+        String cleaned = idStr.replaceAll("[^0-9]", "");
+        if (cleaned.isEmpty()) {
+            throw new IllegalArgumentException("Invalid employee ID format: " + idStr);
+        }
+        Long id = Long.parseLong(cleaned);
         Object result = employeeService.getEmployeeById(id);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
@@ -36,15 +42,21 @@ public class EmployeeTools {
     public Object fetchEmployeeByEmail(@P("The email address of the employee") String email) {
         RoutingContext.addEndpoint("/api/employees/email/" + email);
         Object result = employeeService.getEmployeeByEmail(email);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
     @Tool("Fetches employee details by their employee number (maps to /api/employees/empno/{empno})")
-    public Object fetchEmployeeByEmpno(@P("The numeric employee number") Integer empno) {
-        RoutingContext.addEndpoint("/api/employees/empno/" + empno);
+    public Object fetchEmployeeByEmpno(@P("The numeric employee number") Object empnoVal) {
+        String empnoStr = String.valueOf(empnoVal);
+        RoutingContext.addEndpoint("/api/employees/empno/" + empnoStr);
+        String cleaned = empnoStr.replaceAll("[^0-9]", "");
+        if (cleaned.isEmpty()) {
+            throw new IllegalArgumentException("Invalid employee number format: " + empnoStr);
+        }
+        Integer empno = Integer.parseInt(cleaned);
         Object result = employeeService.getEmployeeByEmpno(empno);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
@@ -52,7 +64,7 @@ public class EmployeeTools {
     public Object fetchEmployeeByNicnum(@P("The NIC card number") String nicnum) {
         RoutingContext.addEndpoint("/api/employees/nic/" + nicnum);
         Object result = employeeService.getEmployeeByNicnum(nicnum);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
@@ -60,7 +72,7 @@ public class EmployeeTools {
     public Object fetchEmployeesByPhone(@P("The phone or mobile number") String phone) {
         RoutingContext.addEndpoint("/api/employees/phone/" + phone);
         Object result = employeeService.getEmployeesByPhone(phone);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 }

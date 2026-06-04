@@ -18,7 +18,7 @@ public class HrSalaryTools {
     public Object fetchAllSalaryScales() {
         RoutingContext.addEndpoint("/api/salary-scales");
         Object result = hrSalaryService.getAllHrSalaries();
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
@@ -26,7 +26,7 @@ public class HrSalaryTools {
     public Object fetchSalaryScaleByCode(@P("The unique alphanumeric code of the salary scale") String code) {
         RoutingContext.addEndpoint("/api/salary-scales/" + code);
         Object result = hrSalaryService.getHrSalaryById(code);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 }

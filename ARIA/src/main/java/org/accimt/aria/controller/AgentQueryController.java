@@ -1,6 +1,7 @@
 package org.accimt.aria.controller;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.accimt.aria.dto.AgentQueryRequest;
 import org.accimt.aria.dto.AgentQueryResponse;
 import org.accimt.aria.service.AgentQueryService;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequestMapping("/api/agent-query")
 @AllArgsConstructor
 @CrossOrigin(origins = "*")
+@Slf4j
 public class AgentQueryController {
 
     private final AgentQueryService agentQueryService;
@@ -26,6 +28,7 @@ public class AgentQueryController {
                             .build()
             );
         }
+        log.info("Executing query agent query controller");
         return ResponseEntity.ok(agentQueryService.executeQuery(request));
     }
 

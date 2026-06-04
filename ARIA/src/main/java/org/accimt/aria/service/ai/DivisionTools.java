@@ -18,15 +18,21 @@ public class DivisionTools {
     public Object fetchAllDivisions() {
         RoutingContext.addEndpoint("/api/divisions");
         Object result = divisionService.getAllDivisions();
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
     @Tool("Fetches details of a specific division by its unique ID (maps to /api/divisions/{id})")
-    public Object fetchDivisionById(@P("The unique numeric ID of the division") Integer id) {
-        RoutingContext.addEndpoint("/api/divisions/" + id);
+    public Object fetchDivisionById(@P("The unique numeric ID of the division") Object idVal) {
+        String idStr = String.valueOf(idVal);
+        RoutingContext.addEndpoint("/api/divisions/" + idStr);
+        String cleaned = idStr.replaceAll("[^0-9]", "");
+        if (cleaned.isEmpty()) {
+            throw new IllegalArgumentException("Invalid division ID format: " + idStr);
+        }
+        Integer id = Integer.parseInt(cleaned);
         Object result = divisionService.getDivisionById(id);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 }

@@ -18,15 +18,21 @@ public class EmpTypeTools {
     public Object fetchAllEmployeeTypes() {
         RoutingContext.addEndpoint("/api/employee-types");
         Object result = empTypeService.getAllEmpTypes();
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
     @Tool("Fetches details of a specific employee type by its unique ID (maps to /api/employee-types/{id})")
-    public Object fetchEmployeeTypeById(@P("The unique numeric ID of the employee type") Integer id) {
-        RoutingContext.addEndpoint("/api/employee-types/" + id);
+    public Object fetchEmployeeTypeById(@P("The unique numeric ID of the employee type") Object idVal) {
+        String idStr = String.valueOf(idVal);
+        RoutingContext.addEndpoint("/api/employee-types/" + idStr);
+        String cleaned = idStr.replaceAll("[^0-9]", "");
+        if (cleaned.isEmpty()) {
+            throw new IllegalArgumentException("Invalid employee type ID format: " + idStr);
+        }
+        Integer id = Integer.parseInt(cleaned);
         Object result = empTypeService.getEmpTypeById(id);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 }

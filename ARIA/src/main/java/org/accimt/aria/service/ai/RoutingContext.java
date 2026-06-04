@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RoutingContext {
     private static final ThreadLocal<List<String>> CALLED_ENDPOINTS = ThreadLocal.withInitial(ArrayList::new);
-    private static final ThreadLocal<Object> LAST_RESULT = new ThreadLocal<>();
+    private static final ThreadLocal<List<Object>> CALLED_RESULTS = ThreadLocal.withInitial(ArrayList::new);
 
     public static List<String> getCalledEndpoints() {
         return CALLED_ENDPOINTS.get();
@@ -15,16 +15,16 @@ public class RoutingContext {
         CALLED_ENDPOINTS.get().add(endpoint);
     }
 
-    public static Object getLastResult() {
-        return LAST_RESULT.get();
+    public static List<Object> getResults() {
+        return CALLED_RESULTS.get();
     }
 
-    public static void setLastResult(Object result) {
-        LAST_RESULT.set(result);
+    public static void addResult(Object result) {
+        CALLED_RESULTS.get().add(result);
     }
 
     public static void clear() {
         CALLED_ENDPOINTS.get().clear();
-        LAST_RESULT.remove();
+        CALLED_RESULTS.get().clear();
     }
 }

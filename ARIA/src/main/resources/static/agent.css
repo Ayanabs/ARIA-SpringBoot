@@ -257,13 +257,12 @@ body {
     overflow-x: hidden;
     padding: 1.5rem 1rem;
     width: 100%;
-    display: flex;
-    justify-content: center;
 }
 
 .chat-content {
     width: 100%;
     max-width: 800px;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     gap: 1.8rem;
@@ -313,7 +312,7 @@ body {
     width: 36px;
     height: 36px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-purple), var(--accent-pink));
+
     display: flex;
     align-items: center;
     justify-content: center;
@@ -324,8 +323,8 @@ body {
 }
 
 .message-avatar.assistant-avatar img {
-    width: 24px;
-    height: 24px;
+    width: 44px;
+    height: 44px;
     object-fit: contain;
 }
 
@@ -357,8 +356,8 @@ body {
 }
 
 .welcome-icon {
-    width: 64px;
-    height: 64px;
+    width: 164px;
+    height: 164px;
     border-radius: 16px;
 
     display: flex;
@@ -370,8 +369,8 @@ body {
 }
 
 .welcome-icon img {
-    width: 62px;
-    height: 62px;
+    width: 162px;
+    height: 162px;
     object-fit: contain;
 }
 
@@ -577,7 +576,7 @@ body {
     position: absolute;
     top: 12px;
     right: 12px;
-    background-color: var(--btn-copy-bg);
+    
     border: 1px solid var(--card-border);
     color: var(--text-muted);
     width: 32px;
@@ -591,7 +590,7 @@ body {
 }
 
 .btn-copy:hover {
-    background-color: var(--btn-copy-hover-bg);
+
     color: var(--text-main);
 }
 
@@ -850,7 +849,7 @@ body {
 
 /* Dark mode adjustments for toggle */
 [data-theme="dark"] .toggle-ball {
-    transform: translateX(24px);
+    transform: translateX(26px);
 }
 
 [data-theme="dark"] .theme-toggle-btn {

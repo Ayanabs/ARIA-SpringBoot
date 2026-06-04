@@ -18,15 +18,21 @@ public class DesignationTools {
     public Object fetchAllDesignations() {
         RoutingContext.addEndpoint("/api/designations");
         Object result = designationService.getAllDesignations();
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 
     @Tool("Fetches details of a specific designation by its unique ID (maps to /api/designations/{id})")
-    public Object fetchDesignationById(@P("The unique numeric ID of the designation") Integer id) {
-        RoutingContext.addEndpoint("/api/designations/" + id);
+    public Object fetchDesignationById(@P("The unique numeric ID of the designation") Object idVal) {
+        String idStr = String.valueOf(idVal);
+        RoutingContext.addEndpoint("/api/designations/" + idStr);
+        String cleaned = idStr.replaceAll("[^0-9]", "");
+        if (cleaned.isEmpty()) {
+            throw new IllegalArgumentException("Invalid designation ID format: " + idStr);
+        }
+        Integer id = Integer.parseInt(cleaned);
         Object result = designationService.getDesignationById(id);
-        RoutingContext.setLastResult(result);
+        RoutingContext.addResult(result);
         return result;
     }
 }

@@ -69,15 +69,37 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             String endpointStr = endpoints.isEmpty() ? "None" : String.join(", ", endpoints);
             log.info("Tool called endpoints: {}", endpointStr);
 
-            List<Map<String, Object>> queryResults;
-            Object rawResult = org.accimt.aria.service.ai.RoutingContext.getLastResult();
-            if (rawResult != null) {
-                log.info("Directly using raw result from tool call of class: {}", rawResult.getClass().getName());
-                if (rawResult instanceof Collection) {
-                    queryResults = objectMapper.convertValue(rawResult, new TypeReference<List<Map<String, Object>>>() {});
-                } else {
-                    Map<String, Object> map = objectMapper.convertValue(rawResult, new TypeReference<Map<String, Object>>() {});
-                    queryResults = Collections.singletonList(map);
+            List<Map<String, Object>> queryResults = new ArrayList<>();
+            List<AgentQueryResponse.EndpointResultGroup> endpointResults = new ArrayList<>();
+            List<Object> rawResults = org.accimt.aria.service.ai.RoutingContext.getResults();
+
+            if (!rawResults.isEmpty()) {
+                log.info("Directly combining raw results from {} tool call(s)", rawResults.size());
+                int size = Math.min(endpoints.size(), rawResults.size());
+                for (int i = 0; i < size; i++) {
+                    String endpoint = endpoints.get(i);
+                    Object rawResult = rawResults.get(i);
+                    if (rawResult == null) {
+                        continue;
+                    }
+
+                    List<Map<String, Object>> records = new ArrayList<>();
+                    if (rawResult instanceof Collection) {
+                        List<Map<String, Object>> list = objectMapper.convertValue(
+                                rawResult, 
+                                new TypeReference<List<Map<String, Object>>>() {}
+                        );
+                        records.addAll(list);
+                    } else {
+                        Map<String, Object> map = objectMapper.convertValue(
+                                rawResult, 
+                                new TypeReference<Map<String, Object>>() {}
+                        );
+                        records.add(map);
+                    }
+
+                    queryResults.addAll(records);
+                    endpointResults.add(new AgentQueryResponse.EndpointResultGroup(endpoint, records));
                 }
             } else {
                 String cleanedJson = cleanJson(processedJson);
@@ -101,6 +123,7 @@ public class AgentQueryServiceImpl implements AgentQueryService {
             return AgentQueryResponse.builder()
                     .sql("Agent routed request to API endpoint via Tool Call: " + endpointStr)
                     .results(queryResults)
+                    .endpointResults(endpointResults)
                     .executionTimeMs(executionTime)
                     .build();
 

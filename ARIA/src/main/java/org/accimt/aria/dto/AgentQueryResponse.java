@@ -14,6 +14,15 @@ import java.util.Map;
 public class AgentQueryResponse {
     private String sql;
     private List<Map<String, Object>> results;
+    private List<EndpointResultGroup> endpointResults;
     private String error;
     private Long executionTimeMs;
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class EndpointResultGroup {
+        private String endpoint;
+        private List<Map<String, Object>> records;
+    }
 }
