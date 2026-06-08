@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  DOCKERHUB_REPOSITORY: ayanabs/aria-springboot
+  DOCKERHUB_REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY || 'ayanabs/aria-springboot' }}
 
 jobs:
   build-and-push:
