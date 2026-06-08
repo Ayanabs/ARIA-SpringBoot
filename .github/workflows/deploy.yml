@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  DOCKERHUB_IMAGE_NAME: aria-springboot
+  DOCKERHUB_REPOSITORY: ayanabs/aria-springboot
 
 jobs:
   build-and-push:
@@ -52,7 +52,7 @@ jobs:
         with:
           images: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            docker.io/${{ secrets.DOCKERHUB_USERNAME }}/${{ env.DOCKERHUB_IMAGE_NAME }}
+            docker.io/${{ env.DOCKERHUB_REPOSITORY }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
