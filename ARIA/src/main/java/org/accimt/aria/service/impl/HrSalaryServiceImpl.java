@@ -19,24 +19,6 @@ public class HrSalaryServiceImpl implements HrSalaryService {
     private final HrSalaryMapping hrSalaryMapping;
 
     @Override
-    public HrSalaryDto createHrSalary(HrSalaryDto dto) {
-        HrSalary entity = hrSalaryMapping.mapToEntity(dto);
-        HrSalary savedEntity = hrSalaryRepository.save(entity);
-        return hrSalaryMapping.toDto(savedEntity);
-    }
-
-    @Override
-    public HrSalaryDto updateHrSalary(HrSalaryDto dto) {
-        HrSalary existing = hrSalaryRepository.findById(dto.getSalarycode())
-                .orElseThrow(() -> new RuntimeException("Salary scale not found with code: " + dto.getSalarycode()));
-
-        if (dto.getSalaryscale() != null) existing.setSalaryscale(dto.getSalaryscale());
-
-        HrSalary updated = hrSalaryRepository.save(existing);
-        return hrSalaryMapping.toDto(updated);
-    }
-
-    @Override
     public HrSalaryDto getHrSalaryById(String id) {
         HrSalary entity = hrSalaryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Salary scale not found with code: " + id));
@@ -50,8 +32,5 @@ public class HrSalaryServiceImpl implements HrSalaryService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteHrSalaryById(String id) {
-        throw new UnsupportedOperationException("Deletions are not allowed in this project");
-    }
+
 }

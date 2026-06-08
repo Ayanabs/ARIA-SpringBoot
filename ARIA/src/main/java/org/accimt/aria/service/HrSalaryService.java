@@ -7,9 +7,8 @@ import java.util.List;
 
 @Service
 public interface HrSalaryService {
-    HrSalaryDto createHrSalary(HrSalaryDto dto);
-    HrSalaryDto updateHrSalary(HrSalaryDto dto);
+
     HrSalaryDto getHrSalaryById(String id);
     List<HrSalaryDto> getAllHrSalaries();
-    void deleteHrSalaryById(String id);
+
 }

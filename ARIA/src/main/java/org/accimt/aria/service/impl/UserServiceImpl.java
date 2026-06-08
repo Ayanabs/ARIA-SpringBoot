@@ -20,42 +20,6 @@ public class UserServiceImpl implements UserService {
     private final UserMapping userMapping;
     private final PasswordEncoder passwordEncoder;
 
-    @Override
-    public UserDto createUser(UserDto dto) {
-        User entity = userMapping.mapToEntity(dto);
-        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
-        entity.setCreatedAt(LocalDateTime.now());
-        User savedUser = userRepository.save(entity);
-        return userMapping.toDto(savedUser);
-    }
-
-    @Override
-    public UserDto updateUser(UserDto dto) {
-        User existingUser = userRepository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + dto.getId()));
-
-        if (dto.getFname() != null) existingUser.setFname(dto.getFname());
-        if (dto.getSurname() != null) existingUser.setSurname(dto.getSurname());
-        if (dto.getEmail() != null) existingUser.setEmail(dto.getEmail());
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            existingUser.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
-
-        if (dto.getPhone() != null && !dto.getPhone().isBlank()) {
-            try {
-                existingUser.setPhone(Integer.valueOf(dto.getPhone()));
-            } catch (NumberFormatException e) {
-
-            }
-        }
-
-        if (dto.getRole() != null && !dto.getRole().isBlank()) {
-            existingUser.setRole(dto.getRole().toUpperCase().trim());
-        }
-
-        User updatedUser = userRepository.save(existingUser);
-        return userMapping.toDto(updatedUser);
-    }
 
     @Override
     public UserDto getUserById(Long id) {
@@ -72,8 +36,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUserById(Long id) {
-        throw new UnsupportedOperationException("Deletions are not allowed in this project");
+    public UserDto createUser(UserDto userDto) {
+        if (userRepository.findByEmail(userDto.getEmail()).isPresent()) {
+            throw new RuntimeException("Email is already registered: " + userDto.getEmail());
+        }
+        User user = userMapping.mapToEntity(userDto);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setCreatedAt(LocalDateTime.now());
+        User savedUser = userRepository.save(user);
+        return userMapping.toDto(savedUser);
     }
 }
 

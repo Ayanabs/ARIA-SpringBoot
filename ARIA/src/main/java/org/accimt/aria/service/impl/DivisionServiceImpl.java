@@ -18,27 +18,6 @@ public class DivisionServiceImpl implements DivisionService {
     private final DivisionRepository divisionRepository;
     private final DivisionMapping divisionMapping;
 
-    @Override
-    public DivisionDto createDivision(DivisionDto dto) {
-        Division entity = divisionMapping.mapToEntity(dto);
-        Division savedDivision = divisionRepository.save(entity);
-        return divisionMapping.toDto(savedDivision);
-    }
-
-    @Override
-    public DivisionDto updateDivision(DivisionDto dto) {
-        Division existingDivision = divisionRepository.findById(dto.getDivisioncode())
-                .orElseThrow(() -> new RuntimeException("Division not found with code: " + dto.getDivisioncode()));
-
-        if (dto.getDivision() != null) existingDivision.setDivision(dto.getDivision());
-        if (dto.getShCode() != null) existingDivision.setShCode(dto.getShCode());
-        if (dto.getHod() != null) existingDivision.setHod(dto.getHod());
-        if (dto.getDdg() != null) existingDivision.setDdg(dto.getDdg());
-        if (dto.getDg() != null) existingDivision.setDg(dto.getDg());
-
-        Division updatedDivision = divisionRepository.save(existingDivision);
-        return divisionMapping.toDto(updatedDivision);
-    }
 
     @Override
     public DivisionDto getDivisionById(Integer id) {
@@ -54,8 +33,5 @@ public class DivisionServiceImpl implements DivisionService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteDivisionById(Integer id) {
-        throw new UnsupportedOperationException("Deletions are not allowed in this project");
-    }
+
 }

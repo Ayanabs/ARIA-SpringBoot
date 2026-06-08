@@ -18,24 +18,6 @@ public class DesignationServiceImpl implements DesignationService {
     private final DesignationRepository designationRepository;
     private final DesignationMapping designationMapping;
 
-    @Override
-    public DesignationDto createDesignation(DesignationDto dto) {
-        Designation entity = designationMapping.mapToEntity(dto);
-        Designation savedEntity = designationRepository.save(entity);
-        return designationMapping.toDto(savedEntity);
-    }
-
-    @Override
-    public DesignationDto updateDesignation(DesignationDto dto) {
-        Designation existing = designationRepository.findById(dto.getDesigcode())
-                .orElseThrow(() -> new RuntimeException("Designation not found with code: " + dto.getDesigcode()));
-
-        if (dto.getDesignation() != null) existing.setDesignation(dto.getDesignation());
-        if (dto.getMainid() != null) existing.setMainid(dto.getMainid());
-
-        Designation updated = designationRepository.save(existing);
-        return designationMapping.toDto(updated);
-    }
 
     @Override
     public DesignationDto getDesignationById(Integer id) {
@@ -51,8 +33,4 @@ public class DesignationServiceImpl implements DesignationService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteDesignationById(Integer id) {
-        throw new UnsupportedOperationException("Deletions are not allowed in this project");
-    }
 }

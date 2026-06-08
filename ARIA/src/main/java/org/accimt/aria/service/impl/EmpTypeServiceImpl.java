@@ -19,24 +19,6 @@ public class EmpTypeServiceImpl implements EmpTypeService {
     private final EmpTypeMapping empTypeMapping;
 
     @Override
-    public EmpTypeDto createEmpType(EmpTypeDto dto) {
-        EmpType entity = empTypeMapping.mapToEntity(dto);
-        EmpType savedEntity = empTypeRepository.save(entity);
-        return empTypeMapping.toDto(savedEntity);
-    }
-
-    @Override
-    public EmpTypeDto updateEmpType(EmpTypeDto dto) {
-        EmpType existing = empTypeRepository.findById(dto.getEmptypecode())
-                .orElseThrow(() -> new RuntimeException("Employee Type not found with code: " + dto.getEmptypecode()));
-
-        if (dto.getEmptype() != null) existing.setEmptype(dto.getEmptype());
-
-        EmpType updated = empTypeRepository.save(existing);
-        return empTypeMapping.toDto(updated);
-    }
-
-    @Override
     public EmpTypeDto getEmpTypeById(Integer id) {
         EmpType entity = empTypeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee Type not found with code: " + id));
@@ -50,8 +32,5 @@ public class EmpTypeServiceImpl implements EmpTypeService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void deleteEmpTypeById(Integer id) {
-        throw new UnsupportedOperationException("Deletions are not allowed in this project");
-    }
+
 }
