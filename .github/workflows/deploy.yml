@@ -9,7 +9,7 @@ on:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
-  DOCKERHUB_REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY || 'ayanabs/aria-springboot' }}
+  DOCKERHUB_REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY }}
 
 jobs:
   build-and-push:
@@ -45,6 +45,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Validate Docker Hub repository configuration
+        run: |
+          if [ -z "${{ env.DOCKERHUB_REPOSITORY }}" ]; then
+            echo "Missing repository variable DOCKERHUB_REPOSITORY (format: dockerhub-username/repository-name)."
+            exit 1
+          fi
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
