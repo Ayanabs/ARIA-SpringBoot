@@ -44,8 +44,9 @@ jobs:
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_REPOSITORY: ${{ env.DOCKERHUB_REPOSITORY }}
         run: |
-          if [ -z "${{ env.DOCKERHUB_REPOSITORY }}" ]; then
+          if [ -z "$DOCKERHUB_REPOSITORY" ]; then
             echo "Missing repository variable DOCKERHUB_REPOSITORY (format: dockerhub-username/repository-name)."
             exit 1
           fi
