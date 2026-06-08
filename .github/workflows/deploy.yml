@@ -30,6 +30,7 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean package -DskipTests
+        working-directory: ARIA
 
       - name: Log in to the Container registry
         uses: docker/login-action@v3
