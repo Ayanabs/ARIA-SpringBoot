@@ -51,19 +51,25 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
-            # 1. Pull the newest image from Docker Hub
+            # 1. Log in to Docker Hub on your remote server
+            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
+            
+            # 2. Pull the newest image
             docker pull docker.io/${{ env.DOCKERHUB_REPOSITORY }}:latest
             
-            # 2. Stop and remove the old running container if it exists
+            # 3. Stop and remove old running container if it exists
             docker stop aria-container || true
             docker rm aria-container || true
             
-            # 3. Run the new container (adjust ports if necessary)
+            # 4. Run the new container
             docker run -d \
               --name aria-container \
               --restart always \
               -p 8080:8080 \
               docker.io/${{ env.DOCKERHUB_REPOSITORY }}:latest
             
-            # 4. Clean up old, unused image variants
+            # 5. Clean up old image variants
             docker image prune -f
+            
+            # 6. Log out for security
+            docker logout
