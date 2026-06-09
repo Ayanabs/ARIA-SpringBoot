@@ -40,22 +40,26 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Validate Docker Hub configuration
+      - name: Prepare Docker image targets
+        id: image-targets
         env:
           DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
           DOCKERHUB_REPOSITORY: ${{ env.DOCKERHUB_REPOSITORY }}
         run: |
-          if [ -z "$DOCKERHUB_REPOSITORY" ]; then
-            echo "Missing repository variable DOCKERHUB_REPOSITORY (format: dockerhub-username/repository-name)."
-            exit 1
+          echo "images<<EOF" >> "$GITHUB_OUTPUT"
+          echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}" >> "$GITHUB_OUTPUT"
+          if [ -n "$DOCKERHUB_REPOSITORY" ] && [ -n "$DOCKERHUB_USERNAME" ] && [ -n "$DOCKERHUB_TOKEN" ]; then
+            echo "docker.io/$DOCKERHUB_REPOSITORY" >> "$GITHUB_OUTPUT"
+            echo "dockerhub_enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "dockerhub_enabled=false" >> "$GITHUB_OUTPUT"
+            echo "Docker Hub credentials/repository not fully configured. Skipping Docker Hub image publishing."
           fi
-          if [ -z "$DOCKERHUB_USERNAME" ] || [ -z "$DOCKERHUB_TOKEN" ]; then
-            echo "Missing Docker Hub secrets DOCKERHUB_USERNAME and/or DOCKERHUB_TOKEN."
-            exit 1
-          fi
+          echo "EOF" >> "$GITHUB_OUTPUT"
 
       - name: Log in to Docker Hub
+        if: steps.image-targets.outputs.dockerhub_enabled == 'true'
         uses: docker/login-action@v4
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -65,9 +69,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-            docker.io/${{ env.DOCKERHUB_REPOSITORY }}
+          images: ${{ steps.image-targets.outputs.images }}
           tags: |
             type=ref,event=branch
             type=semver,pattern={{version}}
