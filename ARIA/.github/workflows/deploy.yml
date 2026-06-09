@@ -5,7 +5,7 @@ on:
     branches: [ "main", "master" ]
 
 env:
-  DOCKERHUB_REPOSITORY: ${{ vars.DOCKERHUB_REPOSITORY }}
+  DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
 
 jobs:
   docker:
