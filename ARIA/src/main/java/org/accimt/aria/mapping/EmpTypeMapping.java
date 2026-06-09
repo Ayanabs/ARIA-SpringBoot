@@ -1,15 +1,17 @@
 package org.accimt.aria.mapping;
 
+import lombok.RequiredArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.accimt.aria.dto.EmpTypeDto;
 import org.accimt.aria.entity.EmpType;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class EmpTypeMapping {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final ObjectMapper objectMapper;
     public EmpTypeDto toDto(EmpType entity) {
         if (entity == null) {
             return null;

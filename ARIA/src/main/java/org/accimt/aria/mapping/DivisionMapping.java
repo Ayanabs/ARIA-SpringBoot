@@ -1,5 +1,7 @@
 package org.accimt.aria.mapping;
 
+import lombok.RequiredArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.accimt.aria.dto.DivisionDto;
 import org.accimt.aria.dto.EmployeeDto;
@@ -8,10 +10,10 @@ import org.accimt.aria.entity.Employee;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class DivisionMapping {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final ObjectMapper objectMapper;
     public DivisionDto toDto(Division entity) {
         if (entity == null) {
             return null;

@@ -1,19 +1,18 @@
 package org.accimt.aria.mapping;
 
+import lombok.RequiredArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.accimt.aria.dto.PositionsTblDto;
 import org.accimt.aria.entity.PositionsTbl;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class PositionsTblMapping {
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
+    private final ObjectMapper objectMapper;
     public PositionsTblDto toDto(PositionsTbl entity) {
         if (entity == null) {
             return null;

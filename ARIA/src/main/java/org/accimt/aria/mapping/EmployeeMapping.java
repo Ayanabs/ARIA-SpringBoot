@@ -1,35 +1,23 @@
 package org.accimt.aria.mapping;
 
+import lombok.RequiredArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import org.accimt.aria.dto.EmployeeDto;
 import org.accimt.aria.entity.Employee;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class EmployeeMapping {
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
+    private final ObjectMapper objectMapper;
     private final CategoryMapping categoryMapping;
     private final DivisionMapping divisionMapping;
     private final DesignationMapping designationMapping;
     private final EmpTypeMapping empTypeMapping;
     private final HrSalaryMapping hrSalaryMapping;
-
-    public EmployeeMapping(CategoryMapping categoryMapping, DivisionMapping divisionMapping,
-                           DesignationMapping designationMapping, EmpTypeMapping empTypeMapping,
-                           HrSalaryMapping hrSalaryMapping) {
-        this.categoryMapping = categoryMapping;
-        this.divisionMapping = divisionMapping;
-        this.designationMapping = designationMapping;
-        this.empTypeMapping = empTypeMapping;
-        this.hrSalaryMapping = hrSalaryMapping;
-    }
-
     public EmployeeDto toDto(Employee entity) {
         if (entity == null) {
             return null;

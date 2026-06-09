@@ -1,15 +1,17 @@
 package org.accimt.aria.mapping;
 
+import lombok.RequiredArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.accimt.aria.dto.HrEduLevelsDto;
 import org.accimt.aria.entity.HrEduLevels;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class HrEduLevelsMapping {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
+    private final ObjectMapper objectMapper;
     public HrEduLevelsDto toDto(HrEduLevels entity) {
         if (entity == null) {
             return null;

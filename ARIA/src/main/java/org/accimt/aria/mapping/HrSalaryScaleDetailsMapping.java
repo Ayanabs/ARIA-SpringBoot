@@ -1,19 +1,18 @@
 package org.accimt.aria.mapping;
 
+import lombok.RequiredArgsConstructor;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.accimt.aria.dto.HrSalaryScaleDetailsDto;
 import org.accimt.aria.entity.HrSalaryScaleDetails;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class HrSalaryScaleDetailsMapping {
 
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .registerModule(new JavaTimeModule())
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-
+    private final ObjectMapper objectMapper;
     public HrSalaryScaleDetailsDto toDto(HrSalaryScaleDetails entity) {
         if (entity == null) {
             return null;
