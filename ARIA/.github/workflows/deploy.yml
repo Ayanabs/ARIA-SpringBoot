@@ -50,26 +50,32 @@ jobs:
           host: ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
-          script: |
-            # 1. Log in to Docker Hub on your remote server
-            echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" --password-stdin
-            
-            # 2. Pull the newest image
-            docker pull docker.io/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
-            
-            # 3. Stop and remove old running container if it exists
-            docker stop aria-container || true
-            docker rm aria-container || true
-            
-            # 4. Run the new container 
-            docker run -d \
-              --name aria-container \
-              --restart always \
-              -p 8080:8080 \
-              docker.io/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
-            
-            # 5. Clean up old image variants
-            docker image prune -f
-            
-            # 6. Log out for security
-            docker logout
+          
+          envs: DOCKERHUB_TOKEN,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY
+        env:
+          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
+        script: |
+          # 1. Log in to Docker Hub on your remote server (Using env variables + sudo)
+          echo "$DOCKERHUB_TOKEN" | sudo docker login -u "$DOCKERHUB_USERNAME" --password-stdin
+          
+          # 2. Pull the newest image (💡 FIX 2: Added sudo and fixed variable syntax)
+          sudo docker pull docker.io/$DOCKERHUB_REPOSITORY:latest
+          
+          # 3. Stop and remove old running container if it exists
+          sudo docker stop aria-container || true
+          sudo docker rm aria-container || true
+          
+          # 4. Run the new container 
+          sudo docker run -d \
+            --name aria-container \
+            --restart always \
+            -p 8080:8080 \
+            docker.io/$DOCKERHUB_REPOSITORY:latest
+          
+          # 5. Clean up old image variants
+          sudo docker image prune -f
+          
+          # 6. Log out for security
+          sudo docker logout
