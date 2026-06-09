@@ -5,10 +5,8 @@ on:
     branches: [ "main", "master" ]
 
 jobs:
-  docker:
-    runs-on: ubuntu-latest
-    outputs:
-      tags: ${{ steps.meta.outputs.tags }}
+  docker-and-deploy:
+    runs-on: self-hosted  # <--- Triggers the job directly on your Ubuntu 24.04 server
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -23,7 +21,6 @@ jobs:
         id: meta
         uses: docker/metadata-action@v6
         with:
-          # 💡 FIX 1: Point directly to secrets context so the job can read it
           images: docker.io/${{ secrets.DOCKERHUB_REPOSITORY }}
           tags: |
             type=ref,event=branch
@@ -38,41 +35,18 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
 
-  deploy:
-    runs-on: ubuntu-latest
-    needs: docker
-    steps:
-      - name: Deploy to Ubuntu 24.04 Server
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USER }}
-          key: ${{ secrets.SERVER_SSH_KEY }}
-          envs: DOCKERHUB_TOKEN,DOCKERHUB_USERNAME,DOCKERHUB_REPOSITORY
-          script: |
-            # 1. Log in to Docker Hub
-            echo "$DOCKERHUB_TOKEN" | sudo -S docker login -u "$DOCKERHUB_USERNAME" --password-stdin
-            
-            # 2. Pull the newest container image
-            sudo docker pull docker.io/$DOCKERHUB_REPOSITORY:latest
-            
-            # 3. Stop and remove old running container if it exists
-            sudo docker stop aria-container || true
-            sudo docker rm aria-container || true
-            
-            # 4. Run the new container on port 8080
-            sudo docker run -d \
-              --name aria-container \
-              --restart always \
-              -p 8080:8080 \
-              docker.io/$DOCKERHUB_REPOSITORY:latest
-            
-            # 5. Clean up old unused image layers
-            sudo docker image prune -f
-            
-            # 6. Log out safely
-            sudo docker logout
-        env:
-          DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
-          DOCKERHUB_REPOSITORY: ${{ secrets.DOCKERHUB_REPOSITORY }}
+      - name: Deploy Container Locally
+        run: |
+          # 1. Stop and remove old running container if it exists
+          docker stop aria-container || true
+          docker rm aria-container || true
+          
+          # 2. Run the new container on port 8080
+          docker run -d \
+            --name aria-container \
+            --restart always \
+            -p 8080:8080 \
+            docker.io/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
+          
+          # 3. Clean up old unused image layers to save disk space
+          docker image prune -f
