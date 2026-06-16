@@ -2,11 +2,10 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main", "master" ]
 
 jobs:
-  docker-and-deploy:
-    runs-on: self-hosted  # <--- Triggers the job directly on your Ubuntu 24.04 server
+  docker-build-push:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -34,19 +33,3 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-
-      - name: Deploy Container Locally
-        run: |
-          # 1. Stop and remove old running container if it exists
-          docker stop aria-container || true
-          docker rm aria-container || true
-          
-          # 2. Run the new container on port 8080
-          docker run -d \
-            --name aria-container \
-            --restart always \
-            -p 8080:8080 \
-            docker.io/${{ secrets.DOCKERHUB_REPOSITORY }}:latest
-          
-          # 3. Clean up old unused image layers to save disk space
-          docker image prune -f
